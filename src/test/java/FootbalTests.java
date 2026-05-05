@@ -8,6 +8,9 @@ import io.restassured.response.Response;
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class FootbalTests extends FootballConfig {
 
@@ -101,5 +104,35 @@ public class FootbalTests extends FootballConfig {
         for(String teamName: teamNames) {
             System.out.println(teamName);
         }
+    }
+
+    @Test
+    public void getCompetitions() {
+        given()
+                .when()
+                .get("/competitions")
+        .then()
+                .statusCode(200)
+                .body("competitions", not(empty()));
+    }
+
+    @Test
+    public void getTopScorersForPremierLeague() {
+        given()
+                .when()
+                .get("/competitions/2021/scorers")
+        .then()
+                .statusCode(200)
+                .body("scorers.size()", greaterThan(0));
+    }
+
+    @Test
+    public void getStandingsForPremierLeague() {
+        given()
+                .when()
+                .get("/competitions/2021/standings")
+        .then()
+                .statusCode(200)
+                .body("standings", not(empty()));
     }
 }

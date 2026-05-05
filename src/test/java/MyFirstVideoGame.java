@@ -12,7 +12,7 @@ public class MyFirstVideoGame extends VideoGameConfig {
         given()
                 .log().all()
         .when()
-                .get("/videogamedb")
+                .get(VideoGameEndpoints.ALL_VIDEO_GAMES)
         .then()
                 .log().all();
 

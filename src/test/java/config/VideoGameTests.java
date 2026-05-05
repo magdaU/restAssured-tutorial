@@ -7,7 +7,14 @@ import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
 import objects.VideoGame;
 
+import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
+
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class VideoGameTests extends VideoGameConfig {
 
@@ -39,7 +46,7 @@ public class VideoGameTests extends VideoGameConfig {
 
     @Test
     public void deleteGame() {
-        given().when().delete("videogame/3").then();
+        given().accept("*/*").when().delete("videogame/3").then();
     }
 
     @Test
@@ -60,25 +67,25 @@ public class VideoGameTests extends VideoGameConfig {
 
     @Test
     public void testVideoGameSerializationXML() {
+        InputStream xsd = getClass().getClassLoader().getResourceAsStream("VideoGameXSD.xsd");
         given()
-                .pathParams("VideoGameId", 5)
+                .pathParam("videoGameId", 5)
                 .accept("application/xml")
         .when()
                 .get(VideoGameEndpoints.SINGLE_VIDEO_GAME)
         .then()
-                .body(RestAssuredMatchers.matchesDtdInClasspath("VideoGameXSD.xsd"));
-
+                .body(RestAssuredMatchers.matchesXsd(xsd));
     }
 
     @Test
     public void testVideoGameSchemaJSON(){
         given()
-                .pathParams("VideoGameId", 5)
-                .accept("application/xml")
+                .pathParam("videoGameId", 5)
+                .accept("application/json")
         .when()
                 .get(VideoGameEndpoints.SINGLE_VIDEO_GAME)
         .then()
-                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VideoGameSchema.json"));
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("VideoGameJsonSchema.json"));
     }
 
     @Test
@@ -92,5 +99,44 @@ public class VideoGameTests extends VideoGameConfig {
         VideoGame videoGame = response.getBody().as(VideoGame.class);
 
         System.out.println(videoGame.toString());
+    }
+
+    @Test
+    public void catureResponseTime() {
+        long responseTime = given()
+                .when()
+                .get(VideoGameEndpoints.ALL_VIDEO_GAMES)
+                .timeIn(TimeUnit.MILLISECONDS);
+        System.out.println("Response time: " + responseTime + "ms");
+    }
+
+    @Test
+    public void assertOnResponseTime() {
+        given()
+                .when()
+                .get(VideoGameEndpoints.ALL_VIDEO_GAMES)
+        .then()
+                .time(lessThan(1000L));
+    }
+
+    @Test
+    public void getAllGamesVerifyListNotEmpty() {
+        given()
+                .when()
+                .get(VideoGameEndpoints.ALL_VIDEO_GAMES)
+        .then()
+                .body("size()", greaterThan(0));
+    }
+
+    @Test
+    public void getSingleGameVerifyFields() {
+        given()
+                .pathParam("videoGameId", 1)
+        .when()
+                .get(VideoGameEndpoints.SINGLE_VIDEO_GAME)
+        .then()
+                .body("id", equalTo(1))
+                .body("name", notNullValue())
+                .body("category", notNullValue());
     }
 }
