@@ -791,7 +791,7 @@ mvn -Dtest=FootbalTests test
 
 ## 🔧 Useful Tools
 
-| Tool                | Description                             | Link                                    |
+| Tool                | D[java](src/test/java)escription                             | Link                                    |
 |---------------------|-----------------------------------------|-----------------------------------------|
 | jsonschema2pojo     | Generate POJOs from JSON / JSON Schema  | https://www.jsonschema2pojo.org/        |
 | freeformatter       | Formatters, validators, minifiers       | https://freeformatter.com/              |
