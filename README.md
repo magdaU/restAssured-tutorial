@@ -4,6 +4,7 @@ A Java-based API test project using the **REST Assured** library.
 Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
 
 [![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial/)
+[![CI](https://github.com/magdaU/restAssured-tutorial/actions/workflows/allure-report.yml/badge.svg)](https://github.com/magdaU/restAssured-tutorial/actions/workflows/allure-report.yml)
 
 ---
 
@@ -441,6 +442,31 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 
 ---
 
+## 🚀 CI/CD & Allure Report on GitHub Pages
+
+Every push to `main` automatically:
+1. Runs `VideoGameTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions
+2. Generates the Allure HTML report
+3. Publishes it to **GitHub Pages**
+
+The **Allure Report** badge at the top of this file links directly to the live report.
+
+### First-time GitHub Pages setup
+
+Go to **Settings → Pages** in this repository and set:
+
+| Setting | Value |
+|---------|-------|
+| Source  | **GitHub Actions** |
+
+Save — no branch selection needed. The workflow handles deployment automatically on every push.
+
+### Re-run manually
+
+Go to **Actions → Allure Report → Run workflow** to trigger a fresh run without pushing code.
+
+---
+
 ## ▶️ Running Tests
 
 ### All tests
@@ -563,6 +589,18 @@ mvn -Dtest=FootbalTests test
 
 ---
 
+## ✅ To Do
+
+| # | Improvement | Status |
+|---|-------------|--------|
+| 1 | Runtime API token injection for Football API | ✅ Done |
+| 2 | Rate limit throttling for Football API (free tier 10 req/min) | ✅ Done |
+| 3 | Position-independent assertion in `getFirstTeamName` | ✅ Done |
+| 4 | Allure reporting integration (JUnit 4 + REST Assured filter) | ✅ Done |
+| 5 | Automated Allure report published to GitHub Pages via CI | ✅ Done |
+
+---
+
 ## 🛠️ Improvements
 
 ### 1. Runtime API token injection (`FootballConfig`)
@@ -590,3 +628,31 @@ This keeps the token out of source control and allows flexible CI/local usage.
 **Problem:** The test asserted `teams.name[1] == "Arsenal FC"`, relying on Arsenal being at a specific index in the API response. The football-data.org API does not guarantee a stable team order, so the assertion broke when the order changed.
 
 **Fix:** Replaced the index-based check with `hasItem("Arsenal FC")`, which verifies that Arsenal FC is present anywhere in the list. The test now passes regardless of the ordering returned by the API.
+
+---
+
+### 4. Allure reporting integration
+
+**Problem:** Test results were only visible in Maven console output — no structured report, no request/response details, no historical trend.
+
+**Fix:** Added `allure-junit4` and `allure-rest-assured` dependencies (v2.27.0). The `AllureRestAssured` filter is registered in both `VideoGameConfig` and `FootballConfig`, which automatically attaches the full HTTP request and response to every test in the report. All test methods are annotated with `@Feature`, `@Story`, and `@Description` to produce a structured, readable report.
+
+Reports can be generated locally:
+```powershell
+mvn -Dtest=VideoGameTests test   # run tests
+mvn allure:report                # generate HTML → target/site/allure-maven-plugin/
+mvn allure:serve                 # open in browser
+```
+
+---
+
+### 5. Automated Allure report published to GitHub Pages
+
+**Problem:** The Allure report existed only on the developer's machine and was not accessible to others without running the tests locally.
+
+**Fix:** Added a GitHub Actions workflow (`.github/workflows/allure-report.yml`) that triggers on every push to `main`. It runs all non-Football tests, generates the Allure report, and deploys it to GitHub Pages using the official `actions/deploy-pages` action.
+
+The live report is always available at:  
+👉 **https://magdau.github.io/restAssured-tutorial/**
+
+The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-pages` approach (source: **GitHub Actions** in Pages settings), which is more reliable than the legacy branch-based deployment.
