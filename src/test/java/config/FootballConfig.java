@@ -1,5 +1,6 @@
 package config;
 
+import io.qameta.allure.restassured.AllureRestAssured;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -19,6 +20,7 @@ public class FootballConfig {
         RequestSpecBuilder builder = new RequestSpecBuilder()
                 .setBaseUri("https://api.football-data.org")
                 .setBasePath("/v4")
+                .addFilter(new AllureRestAssured())
                 .addFilter(new ResponseLoggingFilter())
                 .addFilter(new RequestLoggingFilter());
 
