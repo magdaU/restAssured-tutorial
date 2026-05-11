@@ -5,12 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.example</groupId>
-  <artifactId>RestAssuredFundamentals</artifactId>
+  <artifactId>restAssured-tutorial</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>RestAssuredFundamentals</name>
-  <!-- FIXME change it to the project's website -->
-  <url>https://videogamedb.uk</url>
+  <name>restAssured-tutorial</name>
+  <url>https://magdau.github.io/restAssured-tutorial/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
