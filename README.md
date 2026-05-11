@@ -3,8 +3,8 @@
 A Java-based API test project using the **REST Assured** library.  
 Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
 
-[![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial/)
-[![CI](https://github.com/magdaU/restAssured-tutorial/actions/workflows/allure-report.yml/badge.svg)](https://github.com/magdaU/restAssured-tutorial/actions/workflows/allure-report.yml)
+[![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial-with-extends/)
+[![CI](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml/badge.svg)](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml)
 
 ---
 
@@ -654,7 +654,7 @@ mvn allure:serve                 # open in browser
 **Fix:** Added a GitHub Actions workflow (`.github/workflows/allure-report.yml`) that triggers on every push to `main`. It runs all non-Football tests, generates the Allure report, and deploys it to GitHub Pages using the official `actions/deploy-pages` action.
 
 The live report is always available at:  
-👉 **https://magdau.github.io/restAssured-tutorial/**
+👉 **https://magdau.github.io/restAssured-tutorial-with-extends/**
 
 The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-pages` approach (source: **GitHub Actions** in Pages settings), which is more reliable than the legacy branch-based deployment.
 
