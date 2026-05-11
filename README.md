@@ -598,6 +598,7 @@ mvn -Dtest=FootbalTests test
 | 3 | Position-independent assertion in `getFirstTeamName` | ✅ Done |
 | 4 | Allure reporting integration (JUnit 4 + REST Assured filter) | ✅ Done |
 | 5 | Automated Allure report published to GitHub Pages via CI | ✅ Done |
+| 6 | CI runs on `feature/**` and `fix/**` branches (tests only, no deploy) | ✅ Done |
 
 ---
 
@@ -656,3 +657,11 @@ The live report is always available at:
 👉 **https://magdau.github.io/restAssured-tutorial/**
 
 The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-pages` approach (source: **GitHub Actions** in Pages settings), which is more reliable than the legacy branch-based deployment.
+
+---
+
+### 6. CI runs on feature and fix branches
+
+**Problem:** The workflow only triggered on `main`, so tests on `feature/**` and `fix/**` branches were never validated automatically before merge.
+
+**Fix:** Extended the workflow triggers to include `feature/**` and `fix/**` branches. Tests run on all matching branches, but the deploy-to-Pages steps are conditionally skipped (`if: github.ref == 'refs/heads/main'`) so only `main` publishes the live report.
