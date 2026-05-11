@@ -1,4 +1,4 @@
-# REST Assured Fundamentals
+1# REST Assured Fundamentals
 
 A Java-based API test project using the **REST Assured** library.  
 Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
@@ -519,10 +519,12 @@ mvn -Dtest=FootbalTests test
 |---|---|---|---|
 | `VideoGameTests` | 14 | ✅ All pass | None – read-only sandbox API, always available |
 | `VideoGameNegativeTests` | 4 | ✅ All pass | None – tests error responses from the sandbox API |
+| `VideoGameParameterizedTests` | 5 | ✅ All pass | None – runs for game IDs 1-5 |
+| `VideoGameNegativeParameterizedTests` | 4 | ✅ All pass | None – runs for invalid IDs 0, -1, 99999, MAX_VALUE |
 | `FootbalTests` | 12 | ⚠️ Usually pass | HTTP 403 (missing token), HTTP 429 (rate limit), HTTP 500 (server error) |
 | `GpathJSONTest` | 5 | ✅ All pass | None – read-only sandbox API, always available |
 | `GpathXMLTests` | 5 | ✅ All pass | None – read-only sandbox API, always available |
-| **Total** | **40** | | |
+| **Total** | **49** | | |
 
 ---
 
@@ -602,6 +604,7 @@ mvn -Dtest=FootbalTests test
 | 6 | CI runs on `feature/**` and `fix/**` branches (tests only, no deploy) | ✅ Done |
 | 7 | Negative tests — 404, invalid body, null fields (`VideoGameNegativeTests`) | ✅ Done |
 | 8 | `@Step` annotations in Allure for multi-step tests (`VideoGameTests`) | ✅ Done |
+| 9 | Parameterized tests — valid IDs 1-5 and invalid IDs (`@RunWith(Parameterized.class)`) | ✅ Done |
 
 ---
 
@@ -688,6 +691,25 @@ The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily d
 ✔ Assert field 'id' equals 1
 ✔ Assert field 'name' is not null
 ✔ Assert field 'category' is not null
+```
+
+---
+
+### 9. Parameterized tests (`@RunWith(Parameterized.class)`)
+
+**Problem:** Tests like `getSingleGame` were hardcoded to a single game ID. Testing multiple IDs required duplicating the test method, which is verbose and hard to maintain.
+
+**Fix:** Added two parameterized test classes using the standard JUnit 4 `@RunWith(Parameterized.class)` runner:
+
+- **`VideoGameParameterizedTests`** — runs `getSingleGame_ReturnsValidFields` for game IDs 1-5. Each run verifies the `id`, `name`, and `category` fields.
+- **`VideoGameNegativeParameterizedTests`** — runs `getSingleGame_InvalidId_Returns404` for IDs `0`, `-1`, `99999`, and `Integer.MAX_VALUE`. Each run asserts a 404 response.
+
+The `@Parameters(name = "gameId = {0}")` annotation gives each run a descriptive name in the Allure report and Surefire output:
+```
+getSingleGame_ReturnsValidFields[gameId = 1]
+getSingleGame_ReturnsValidFields[gameId = 2]
+...
+getSingleGame_InvalidId_Returns404[gameId = 99999]
 ```
 
 ---
