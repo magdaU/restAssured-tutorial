@@ -1,5 +1,6 @@
 package config;
 
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -18,6 +19,7 @@ public class VideoGameConfig {
                 .setBasePath("api/v2/")
                 .setContentType("application/json")
                 .addHeader("Accept", "application/json")
+                .addFilter(new AllureRestAssured())
                 .addFilter(new RequestLoggingFilter())
                 .addFilter(new ResponseLoggingFilter())
                 .build();

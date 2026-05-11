@@ -1,4 +1,8 @@
 import java.util.List;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 import config.FootballConfig;
@@ -13,9 +17,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 
+@Feature("Football API")
 public class FootbalTests extends FootballConfig {
 
     @Test
+    @Story("Areas")
+    @Description("Retrieves details for a single area by ID")
     public void getDetailsOneAre() {
         given()
                 .queryParam("areas", 2076)
@@ -24,6 +31,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Areas")
+    @Description("Retrieves details for multiple areas by comma-separated IDs")
     public void getDetailsOfMultipleArea(){
         String areaIds ="2076, 2077, 2078";
 
@@ -35,6 +44,8 @@ public class FootbalTests extends FootballConfig {
 
     }
     @Test
+    @Story("Teams")
+    @Description("Verifies the founding year of Arsenal FC")
     public void getDataFounded(){
         given()
                 .when()
@@ -44,6 +55,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Verifies Arsenal FC is in the Premier League team list")
     public void getFirstTeamName(){
         given()
         .when()
@@ -53,12 +66,16 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Teams")
+    @Description("Prints the full JSON response for a team")
     public void getAllTeamData(){
         String responseBody = get("teams/57").asString();
         System.out.println(responseBody);
     }
 
     @Test
+    @Story("Teams")
+    @Description("Validates status code and content type before extracting team data")
     public void getAllTeamData_DoCheckFirst(){
         Response response =
                 given()
@@ -74,6 +91,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Headers")
+    @Description("Extracts and prints Content-Type and X-API-Version headers")
     public void extractHeaders(){
         Response response =
               get("teams/57")
@@ -87,6 +106,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Extracts the first team name from the Premier League competition")
     public void extractHeadersTeamName(){
         String firstTeamName = get("competitions/2021/teams")
                 .jsonPath().getString("teams.name[0]");
@@ -94,6 +115,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Extracts and prints all team names from the Premier League")
     public void extractAllTeams(){
         Response response =
                 get("competitions/2021/teams")
@@ -108,6 +131,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Verifies competitions list is not empty")
     public void getCompetitions() {
         given()
                 .when()
@@ -118,6 +143,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Verifies top scorers list for the Premier League is not empty")
     public void getTopScorersForPremierLeague() {
         given()
                 .when()
@@ -128,6 +155,8 @@ public class FootbalTests extends FootballConfig {
     }
 
     @Test
+    @Story("Competitions")
+    @Description("Verifies standings for the Premier League are not empty")
     public void getStandingsForPremierLeague() {
         given()
                 .when()
