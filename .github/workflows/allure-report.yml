@@ -35,7 +35,7 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: mvn "-Dtest=VideoGameTests,VideoGameNegativeTests,GpathJSONTest,GpathXMLTests,MyFirstVideoGame" test
+        run: mvn "-Dtest=VideoGameTests,VideoGameNegativeTests,VideoGameParameterizedTests,VideoGameNegativeParameterizedTests,GpathJSONTest,GpathXMLTests,MyFirstVideoGame" test
 
       - name: Generate Allure report
         run: mvn allure:report
