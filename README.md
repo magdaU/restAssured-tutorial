@@ -109,18 +109,22 @@ mvn -Dfootball.api.token="your-token" -Dtest=FootbalTests test
 
 ### Tests (`FootbalTests`)
 
-- `getDetailsOneAre` – retrieve data for a single area
-- `getDetailsOfMultipleArea` – retrieve data for multiple areas
-- `getDataFounded` – verify a team's founding year
-- `getFirstTeamName` – get the name of the first team in a league
-- `getAllTeamData` – display full team data
-- `getAllTeamData_DoCheckFirst` – extract response with status code validation
-- `extractHeaders` – read response headers
-- `extractHeadersTeamName` – extract team name via `jsonPath()`
-- `extractAllTeams` – list all teams in a league
-- `getCompetitions` – retrieve all competitions and assert list is not empty
-- `getTopScorersForPremierLeague` – retrieve top scorers for Premier League (competition `2021`)
-- `getStandingsForPremierLeague` – retrieve standings table for Premier League
+| Test | Description | Typical result | Failure reason |
+|---|---|---|---|
+| `getDetailsOneAre` | GET `/areas?areas=2076` | ✅ Pass | HTTP 500 – transient server error |
+| `getDetailsOfMultipleArea` | GET `/areas` with multiple IDs | ✅ Pass | HTTP 500 – transient server error |
+| `getDataFounded` | Assert Arsenal founded year = 1886 | ✅ Pass | HTTP 500 – transient server error |
+| `getFirstTeamName` | Assert Arsenal FC is in Premier League team list | ✅ Pass | HTTP 500 – transient server error |
+| `getAllTeamData` | Print full team JSON | ✅ Pass | HTTP 500 – transient server error |
+| `getAllTeamData_DoCheckFirst` | Extract response with status code check | ✅ Pass | HTTP 500 – transient server error |
+| `extractHeaders` | Print response headers | ✅ Pass | HTTP 500 – transient server error |
+| `extractHeadersTeamName` | Extract team name via `jsonPath()` | ✅ Pass | HTTP 500 – transient server error |
+| `extractAllTeams` | List all Premier League teams | ✅ Pass | HTTP 500 – transient server error |
+| `getCompetitions` | Assert competitions list is not empty | ✅ Pass | HTTP 500 – transient server error |
+| `getTopScorersForPremierLeague` | Assert scorers list is not empty | ✅ Pass | HTTP 500 – transient server error |
+| `getStandingsForPremierLeague` | Assert standings list is not empty | ✅ Pass | HTTP 500 – transient server error |
+
+> ⚠️ All Football tests depend on an external live API. Failures with HTTP 500 indicate a transient server-side issue at football-data.org — rerunning after a short wait usually resolves them. Failures with HTTP 403 mean the token is missing. Failures with HTTP 429 mean the rate limit was exceeded (run too quickly in succession).
 
 ---
 
@@ -464,6 +468,16 @@ mvn -Dtest=FootbalTests test
 ```
 
 > **Note:** Football tests require a free API token from [football-data.org](https://www.football-data.org/). Without a token all Football tests return HTTP 403. The free plan allows 10 requests/min — HTTP 429 is returned if the limit is exceeded.
+
+### Test suite summary
+
+| Test class | Tests | Stable | Known failure causes |
+|---|---|---|---|
+| `VideoGameTests` | 14 | ✅ All pass | None – read-only sandbox API, always available |
+| `FootbalTests` | 12 | ⚠️ Usually pass | HTTP 403 (missing token), HTTP 429 (rate limit), HTTP 500 (server error) |
+| `GpathJSONTest` | 5 | ✅ All pass | None – read-only sandbox API, always available |
+| `GpathXMLTests` | 5 | ✅ All pass | None – read-only sandbox API, always available |
+| **Total** | **36** | | |
 
 ---
 
