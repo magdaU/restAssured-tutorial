@@ -3,6 +3,11 @@
 A Java-based API test project using the **REST Assured** library.  
 Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
 
+![Java](https://img.shields.io/badge/Java-18-orange?logo=openjdk&logoColor=white)
+![REST Assured](https://img.shields.io/badge/REST_Assured-5.3.0-blue)
+![JUnit](https://img.shields.io/badge/JUnit-4.13.2-green?logo=junit5&logoColor=white)
+![Allure Report](https://img.shields.io/badge/Allure_Report-2.27.0-orange?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMTEzLjkgMzE4LjFsLTM4LjggMjMuNmMtMTMuNCA4LjEtMzAuNS0xLjItMzAuNS0xNi45VjE3OS4yYzAtMTUuNyAxNy4xLTI1IDMwLjUtMTYuOWwzOC44IDIzLjZjMTIuOSA3LjkgMTIuOSAyNi4zIDAgMzQuMnoiLz48L3N2Zz4=&logoColor=white)
+
 ---
 
 ## 📋 Technology Stack
@@ -15,6 +20,7 @@ Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course
 | JUnit                 | 4.13.2   |
 | Jackson Databind      | 2.14.2   |
 | JSON Schema Validator | 5.3.0    |
+| Allure Report         | 2.27.0   |
 
 ---
 
@@ -456,6 +462,21 @@ mvn -Dtest=GpathJSONTest test
 mvn -Dtest=GpathXMLTests test
 ```
 
+### Allure report
+
+```powershell
+# Run tests (results saved to target/allure-results/)
+mvn -Dtest=VideoGameTests test
+
+# Generate static HTML report → target/site/allure-maven-plugin/index.html
+mvn allure:report
+
+# Open live report in browser (auto-starts a local server)
+mvn allure:serve
+```
+
+---
+
 ### All tests except Football (no token required)
 ```powershell
 mvn "-Dtest=VideoGameTests,GpathJSONTest,GpathXMLTests,MyFirstVideoGame" test
@@ -513,6 +534,22 @@ mvn -Dtest=FootbalTests test
     <groupId>junit</groupId>
     <artifactId>junit</artifactId>
     <version>4.13.2</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- Allure JUnit 4 adapter -->
+<dependency>
+    <groupId>io.qameta.allure</groupId>
+    <artifactId>allure-junit4</artifactId>
+    <version>2.27.0</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- Allure REST Assured filter -->
+<dependency>
+    <groupId>io.qameta.allure</groupId>
+    <artifactId>allure-rest-assured</artifactId>
+    <version>2.27.0</version>
     <scope>test</scope>
 </dependency>
 ```
