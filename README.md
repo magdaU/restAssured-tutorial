@@ -90,7 +90,9 @@ Tested API: **football-data.org** – football competition data.
 ### Authentication – API token required
 
 Football tests require an API token from [football-data.org](https://www.football-data.org/).  
-Without a token, tests will be automatically skipped (`Assume`).
+Without a token all Football tests return **HTTP 403 Forbidden**.
+
+> ⚠️ The free plan allows **10 requests per minute**. Running the full test suite twice in quick succession returns **HTTP 429 Too Many Requests**. Wait ~1 minute between runs if you hit this limit.
 
 Provide the token in one of two ways:
 
@@ -107,18 +109,22 @@ mvn -Dfootball.api.token="your-token" -Dtest=FootbalTests test
 
 ### Tests (`FootbalTests`)
 
-- `getDetailsOneAre` – retrieve data for a single area
-- `getDetailsOfMultipleArea` – retrieve data for multiple areas
-- `getDataFounded` – verify a team's founding year
-- `getFirstTeamName` – get the name of the first team in a league
-- `getAllTeamData` – display full team data
-- `getAllTeamData_DoCheckFirst` – extract response with status code validation
-- `extractHeaders` – read response headers
-- `extractHeadersTeamName` – extract team name via `jsonPath()`
-- `extractAllTeams` – list all teams in a league
-- `getCompetitions` – retrieve all competitions and assert list is not empty
-- `getTopScorersForPremierLeague` – retrieve top scorers for Premier League (competition `2021`)
-- `getStandingsForPremierLeague` – retrieve standings table for Premier League
+| Test | Description | Typical result | Failure reason |
+|---|---|---|---|
+| `getDetailsOneAre` | GET `/areas?areas=2076` | ✅ Pass | HTTP 500 – transient server error |
+| `getDetailsOfMultipleArea` | GET `/areas` with multiple IDs | ✅ Pass | HTTP 500 – transient server error |
+| `getDataFounded` | Assert Arsenal founded year = 1886 | ✅ Pass | HTTP 500 – transient server error |
+| `getFirstTeamName` | Assert Arsenal FC is in Premier League team list | ✅ Pass | HTTP 500 – transient server error |
+| `getAllTeamData` | Print full team JSON | ✅ Pass | HTTP 500 – transient server error |
+| `getAllTeamData_DoCheckFirst` | Extract response with status code check | ✅ Pass | HTTP 500 – transient server error |
+| `extractHeaders` | Print response headers | ✅ Pass | HTTP 500 – transient server error |
+| `extractHeadersTeamName` | Extract team name via `jsonPath()` | ✅ Pass | HTTP 500 – transient server error |
+| `extractAllTeams` | List all Premier League teams | ✅ Pass | HTTP 500 – transient server error |
+| `getCompetitions` | Assert competitions list is not empty | ✅ Pass | HTTP 500 – transient server error |
+| `getTopScorersForPremierLeague` | Assert scorers list is not empty | ✅ Pass | HTTP 500 – transient server error |
+| `getStandingsForPremierLeague` | Assert standings list is not empty | ✅ Pass | HTTP 500 – transient server error |
+
+> ⚠️ All Football tests depend on an external live API. Failures with HTTP 500 indicate a transient server-side issue at football-data.org — rerunning after a short wait usually resolves them. Failures with HTTP 403 mean the token is missing. Failures with HTTP 429 mean the rate limit was exceeded (run too quickly in succession).
 
 ---
 
@@ -143,292 +149,6 @@ Querying XML responses using **GPath** and **XmlPath** against the VideoGame API
 - `getListOfXMlNodes` – all game names as a list: `List.item.name`
 - `getListOfXMLNodesByFindAllOnAttribute` – filter games by category: `findAll { it.@category == 'Shooter' }`
 - `getSingleNode` – find a specific game by name: `find { it.name == 'Resident Evil 4' }`
-
----
-
-## 🧪 Test Cases
-
-Detailed business-level descriptions of each test with step-by-step scenarios.
-
----
-
-### 🎮 VideoGameTests
-
----
-
-#### `getAllGames`
-| | |
-|---|---|
-| **Step 1** | Set base URI to `https://videogamedb.uk/api/v2/` |
-| **Step 2** | Send a `GET` request to `/videogame` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Expected** | A JSON list of all available video games is returned |
-
----
-
-#### `getSingleGame`
-| | |
-|---|---|
-| **Step 1** | Set base URI to `https://videogamedb.uk/api/v2/` |
-| **Step 2** | Send a `GET` request to `/videogame/1` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Assert the returned game ID equals `1` |
-| **Expected** | A single video game object is returned with correct ID |
-
----
-
-#### `createNewGameByJSON`
-| | |
-|---|---|
-| **Step 1** | Authenticate with `POST /authenticate` to obtain a JWT token |
-| **Step 2** | Build a JSON request body with game name, category, rating, and release year |
-| **Step 3** | Send a `POST` request to `/videogame` with `Content-Type: application/json` |
-| **Step 4** | Verify response status code is `200 OK` |
-| **Expected** | API confirms the new game has been received (not persisted in read-only mode) |
-
----
-
-#### `createNewGameByXML`
-| | |
-|---|---|
-| **Step 1** | Authenticate and obtain a JWT token |
-| **Step 2** | Build an XML request body with game attributes |
-| **Step 3** | Send a `POST` request to `/videogame` with `Content-Type: application/xml` |
-| **Step 4** | Verify response status code is `200 OK` |
-| **Expected** | API accepts the XML payload and confirms the operation |
-
----
-
-#### `updateGame`
-| | |
-|---|---|
-| **Step 1** | Authenticate and obtain a JWT token |
-| **Step 2** | Build a JSON body with updated game data |
-| **Step 3** | Send a `PUT` request to `/videogame/3` |
-| **Step 4** | Verify response status code is `200 OK` |
-| **Expected** | API confirms the update (not persisted in read-only mode) |
-
----
-
-#### `deleteGame`
-| | |
-|---|---|
-| **Step 1** | Authenticate and obtain a JWT token |
-| **Step 2** | Send a `DELETE` request to `/videogame/3` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Expected** | API confirms the deletion (not persisted in read-only mode) |
-
----
-
-#### `testVideoGameSchemaJSON`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` |
-| **Step 2** | Load `VideoGameJsonSchema.json` from resources |
-| **Step 3** | Validate the full response body against the JSON Schema |
-| **Expected** | Response structure matches the defined schema without validation errors |
-
----
-
-#### `testVideoGameSerializationXML`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Load `VideoGameXSD.xsd` from resources |
-| **Step 3** | Validate the XML response against the XSD schema |
-| **Expected** | XML response is valid according to the XSD definition |
-
----
-
-#### `convertJsonToPojo`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame/1` |
-| **Step 2** | Deserialize the JSON response body into a `VideoGame` POJO |
-| **Step 3** | Assert that the object fields (id, name, category) are not null |
-| **Expected** | JSON successfully maps to a `VideoGame` Java object |
-
----
-
-#### `assertOnResponseTime`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` |
-| **Step 2** | Capture the total response time |
-| **Step 3** | Assert that response time is less than `1000 ms` |
-| **Expected** | API responds within the defined SLA threshold |
-
----
-
-### ⚽ FootbalTests
-
----
-
-#### `getDetailsOneAre`
-| | |
-|---|---|
-| **Step 1** | Set base URI to `https://api.football-data.org/v4/` |
-| **Step 2** | Add header `X-Auth-Token` with the API token |
-| **Step 3** | Send a `GET` request to `/areas/2072` |
-| **Step 4** | Verify response status code is `200 OK` |
-| **Expected** | Area details object is returned with correct ID and name |
-
----
-
-#### `getDetailsOfMultipleArea`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/areas` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Assert the response contains multiple area entries |
-| **Expected** | A list of multiple geographic areas is returned |
-
----
-
-#### `getDataFounded`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/teams/{teamId}` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Extract the `founded` field from the response |
-| **Step 5** | Assert the founding year equals the expected value |
-| **Expected** | Correct founding year is returned for the team |
-
----
-
-#### `getFirstTeamName`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Extract the first team name from the `teams[0].name` path |
-| **Expected** | The first team name from the Premier League is returned |
-
----
-
-#### `getAllTeamData_DoCheckFirst`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 3** | Extract the full `Response` object |
-| **Step 4** | Assert response status code is `200 OK` |
-| **Step 5** | Print all team names from the response |
-| **Expected** | Status is validated before extracting and displaying team data |
-
----
-
-#### `extractHeaders`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 3** | Extract all response headers |
-| **Step 4** | Print each header name and value |
-| **Expected** | All HTTP response headers are accessible and printable |
-
----
-
-#### `extractAllTeams`
-| | |
-|---|---|
-| **Step 1** | Authenticate with the API token header |
-| **Step 2** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Use `jsonPath()` to extract the full list of team names |
-| **Step 5** | Assert the list is not empty and print all team names |
-| **Expected** | All Premier League team names are returned in a list |
-
----
-
-### 🔍 GpathJSONTest
-
----
-
-#### `extractMapOfElementsWithFind`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 2** | Apply GPath expression: `teams.find { it.name == 'Arsenal FC' }` |
-| **Step 3** | Extract the matching team as a Map |
-| **Expected** | A single team map with Arsenal FC data is returned |
-
----
-
-#### `extractListOfValueWithFindAll`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 2** | Apply GPath `findAll` to find teams founded after year 1900 |
-| **Step 3** | Extract the list of matching team names |
-| **Expected** | A filtered list of team names satisfying the condition is returned |
-
----
-
-#### `extractSingleValueWithHighestNumber`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to the video game endpoint |
-| **Step 2** | Apply GPath `max { it.id }` to find the game with the highest ID |
-| **Step 3** | Extract the game name |
-| **Expected** | The name of the game with the maximum ID is returned |
-
----
-
-#### `extractMutlipleValuesAndSumThem`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to the video game endpoint |
-| **Step 2** | Apply GPath `collect { it.id }` to extract all IDs |
-| **Step 3** | Call `.sum()` on the collected list |
-| **Expected** | The total sum of all game IDs is returned as a number |
-
----
-
-### 🔍 GpathXMLTests
-
----
-
-#### `getFirstGameInList`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Parse the XML response with `XmlPath` |
-| **Step 3** | Extract `videoGames.videoGame[0].name` |
-| **Expected** | The name of the first game in the XML list is returned |
-
----
-
-#### `getAttribute`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Parse the XML response |
-| **Step 3** | Extract an attribute value from a specific XML element |
-| **Expected** | The correct XML attribute value is returned |
-
----
-
-#### `getListOfXMLNodesByFindAllOnAttribute`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Apply GPath `findAll { it.@category == 'Shooter' }` on the XML response |
-| **Step 3** | Extract the list of matching game nodes |
-| **Expected** | All games belonging to the 'Shooter' category are returned |
-
----
-
-#### `getSingleNode`
-| | |
-|---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Apply GPath `find { it.name == 'Resident Evil 4' }` |
-| **Step 3** | Extract the matching XML node |
-| **Expected** | The XML node for 'Resident Evil 4' is returned with all its attributes |
 
 ---
 
@@ -747,7 +467,17 @@ $env:FOOTBALL_DATA_API_TOKEN="your-token"
 mvn -Dtest=FootbalTests test
 ```
 
-> **Note:** Football tests require a free API token from [football-data.org](https://www.football-data.org/). Without a token all Football tests return HTTP 403.
+> **Note:** Football tests require a free API token from [football-data.org](https://www.football-data.org/). Without a token all Football tests return HTTP 403. The free plan allows 10 requests/min — HTTP 429 is returned if the limit is exceeded.
+
+### Test suite summary
+
+| Test class | Tests | Stable | Known failure causes |
+|---|---|---|---|
+| `VideoGameTests` | 14 | ✅ All pass | None – read-only sandbox API, always available |
+| `FootbalTests` | 12 | ⚠️ Usually pass | HTTP 403 (missing token), HTTP 429 (rate limit), HTTP 500 (server error) |
+| `GpathJSONTest` | 5 | ✅ All pass | None – read-only sandbox API, always available |
+| `GpathXMLTests` | 5 | ✅ All pass | None – read-only sandbox API, always available |
+| **Total** | **36** | | |
 
 ---
 
@@ -796,3 +526,33 @@ mvn -Dtest=FootbalTests test
 | jsonschema2pojo     | Generate POJOs from JSON / JSON Schema  | https://www.jsonschema2pojo.org/        |
 | freeformatter       | Formatters, validators, minifiers       | https://freeformatter.com/              |
 | jsonschemavalidator | Interactive JSON Schema validator       | https://www.jsonschemavalidator.net/    |
+
+---
+
+## 🛠️ Improvements
+
+### 1. Runtime API token injection (`FootballConfig`)
+
+**Problem:** The `X-Auth-Token` header was hardcoded and commented out in `FootballConfig`, meaning the token was never sent to the API. All Football tests returned HTTP 403 Forbidden regardless of what was passed on the command line.
+
+**Fix:** `FootballConfig.setup()` now reads the token at runtime from two sources (in priority order):
+1. JVM system property: `-Dfootball.api.token=<token>`
+2. Environment variable: `FOOTBALL_DATA_API_TOKEN`
+
+This keeps the token out of source control and allows flexible CI/local usage.
+
+---
+
+### 2. Rate limit throttling (`FootballConfig`)
+
+**Problem:** The football-data.org free plan allows **10 requests per minute**. With 12 test methods running back-to-back, the last 2 tests consistently received HTTP 429 Too Many Requests.
+
+**Fix:** Added a `@Before` method (`rateLimitDelay`) in `FootballConfig` that sleeps 6 seconds before each test. At 10 requests/minute the safe inter-request interval is 6 s — this keeps the suite within the free-tier limit without requiring any changes to individual test classes.
+
+---
+
+### 3. Position-independent assertion in `getFirstTeamName` (`FootbalTests`)
+
+**Problem:** The test asserted `teams.name[1] == "Arsenal FC"`, relying on Arsenal being at a specific index in the API response. The football-data.org API does not guarantee a stable team order, so the assertion broke when the order changed.
+
+**Fix:** Replaced the index-based check with `hasItem("Arsenal FC")`, which verifies that Arsenal FC is present anywhere in the list. The test now passes regardless of the ordering returned by the API.
