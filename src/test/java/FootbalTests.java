@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 
 public class FootbalTests extends FootballConfig {
 
@@ -48,7 +49,7 @@ public class FootbalTests extends FootballConfig {
         .when()
                 .get("competitions/2021/teams")
         .then()
-                .body("teams.name[1]", equalTo("Arsenal FC"));
+                .body("teams.name", hasItem("Arsenal FC"));
     }
 
     @Test

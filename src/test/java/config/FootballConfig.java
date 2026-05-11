@@ -1,5 +1,6 @@
 package config;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 import io.restassured.RestAssured;
@@ -12,23 +13,29 @@ public class FootballConfig {
 
     @BeforeClass
     public static void setup() {
+        String token = System.getProperty("football.api.token",
+                System.getenv("FOOTBALL_DATA_API_TOKEN"));
 
-        RestAssured.requestSpecification = new RequestSpecBuilder()
+        RequestSpecBuilder builder = new RequestSpecBuilder()
                 .setBaseUri("https://api.football-data.org")
                 .setBasePath("/v4")
-                //.addHeader("X-Auth-Token", "8df69ce914ac-49e5a64a485ad355ef56")
-                //.addHeader("X-Response-Control", "minified")
                 .addFilter(new ResponseLoggingFilter())
-                .addFilter(new RequestLoggingFilter())
-                .build();
+                .addFilter(new RequestLoggingFilter());
+
+        if (token != null && !token.isEmpty()) {
+            builder.addHeader("X-Auth-Token", token);
+        }
+
+        RestAssured.requestSpecification = builder.build();
 
         RestAssured.responseSpecification = new ResponseSpecBuilder()
                 .expectStatusCode(200)
                 .build();
     }
+
+    @Before
+    public void rateLimitDelay() throws InterruptedException {
+        // free tier allows 10 requests/min — 6s gap keeps us within the limit
+        Thread.sleep(6000);
+    }
 }
-
-
-
-
-
