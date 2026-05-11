@@ -518,10 +518,11 @@ mvn -Dtest=FootbalTests test
 | Test class | Tests | Stable | Known failure causes |
 |---|---|---|---|
 | `VideoGameTests` | 14 | ✅ All pass | None – read-only sandbox API, always available |
+| `VideoGameNegativeTests` | 4 | ✅ All pass | None – tests error responses from the sandbox API |
 | `FootbalTests` | 12 | ⚠️ Usually pass | HTTP 403 (missing token), HTTP 429 (rate limit), HTTP 500 (server error) |
 | `GpathJSONTest` | 5 | ✅ All pass | None – read-only sandbox API, always available |
 | `GpathXMLTests` | 5 | ✅ All pass | None – read-only sandbox API, always available |
-| **Total** | **36** | | |
+| **Total** | **40** | | |
 
 ---
 
@@ -599,6 +600,8 @@ mvn -Dtest=FootbalTests test
 | 4 | Allure reporting integration (JUnit 4 + REST Assured filter) | ✅ Done |
 | 5 | Automated Allure report published to GitHub Pages via CI | ✅ Done |
 | 6 | CI runs on `feature/**` and `fix/**` branches (tests only, no deploy) | ✅ Done |
+| 7 | Negative tests — 404, invalid body, null fields (`VideoGameNegativeTests`) | ✅ Done |
+| 8 | `@Step` annotations in Allure for multi-step tests (`VideoGameTests`) | ✅ Done |
 
 ---
 
@@ -657,6 +660,35 @@ The live report is always available at:
 👉 **https://magdau.github.io/restAssured-tutorial-with-extends/**
 
 The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-pages` approach (source: **GitHub Actions** in Pages settings), which is more reliable than the legacy branch-based deployment.
+
+---
+
+### 7. Negative tests (`VideoGameNegativeTests`)
+
+**Problem:** All existing tests cover only the happy path — valid IDs, well-formed bodies, expected 200 responses. Error scenarios were untested.
+
+**Fix:** Added `VideoGameNegativeTests` class with four tests covering:
+- `getSingleGame_NotFound` — GET non-existent ID → 404
+- `getSingleGame_NegativeId` — GET negative ID → 404
+- `createGame_EmptyBody` — POST empty JSON body → 4xx
+- `createGame_NullFields` — POST POJO with all-null fields → 4xx
+
+The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily disable the global `responseSpecification` (which expects 200) so that 4xx assertions work correctly.
+
+---
+
+### 8. `@Step` annotations for readable Allure reports
+
+**Problem:** The Allure report showed request/response attachments but no logical breakdown of what each test was doing — all test logic was invisible in the report.
+
+**Fix:** Refactored complex tests in `VideoGameTests` and all tests in `VideoGameNegativeTests` to use private `@Step`-annotated methods. Each logical operation (fetch, deserialize, validate schema, assert field, assert time) is now a named step visible in the Allure timeline. Example steps in the report:
+
+```
+✔ GET /videogame/1
+✔ Assert field 'id' equals 1
+✔ Assert field 'name' is not null
+✔ Assert field 'category' is not null
+```
 
 ---
 
