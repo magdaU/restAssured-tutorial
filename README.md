@@ -512,3 +512,33 @@ mvn -Dtest=FootbalTests test
 | jsonschema2pojo     | Generate POJOs from JSON / JSON Schema  | https://www.jsonschema2pojo.org/        |
 | freeformatter       | Formatters, validators, minifiers       | https://freeformatter.com/              |
 | jsonschemavalidator | Interactive JSON Schema validator       | https://www.jsonschemavalidator.net/    |
+
+---
+
+## 🛠️ Improvements
+
+### 1. Runtime API token injection (`FootballConfig`)
+
+**Problem:** The `X-Auth-Token` header was hardcoded and commented out in `FootballConfig`, meaning the token was never sent to the API. All Football tests returned HTTP 403 Forbidden regardless of what was passed on the command line.
+
+**Fix:** `FootballConfig.setup()` now reads the token at runtime from two sources (in priority order):
+1. JVM system property: `-Dfootball.api.token=<token>`
+2. Environment variable: `FOOTBALL_DATA_API_TOKEN`
+
+This keeps the token out of source control and allows flexible CI/local usage.
+
+---
+
+### 2. Rate limit throttling (`FootballConfig`)
+
+**Problem:** The football-data.org free plan allows **10 requests per minute**. With 12 test methods running back-to-back, the last 2 tests consistently received HTTP 429 Too Many Requests.
+
+**Fix:** Added a `@Before` method (`rateLimitDelay`) in `FootballConfig` that sleeps 6 seconds before each test. At 10 requests/minute the safe inter-request interval is 6 s — this keeps the suite within the free-tier limit without requiring any changes to individual test classes.
+
+---
+
+### 3. Position-independent assertion in `getFirstTeamName` (`FootbalTests`)
+
+**Problem:** The test asserted `teams.name[1] == "Arsenal FC"`, relying on Arsenal being at a specific index in the API response. The football-data.org API does not guarantee a stable team order, so the assertion broke when the order changed.
+
+**Fix:** Replaced the index-based check with `hasItem("Arsenal FC")`, which verifies that Arsenal FC is present anywhere in the list. The test now passes regardless of the ordering returned by the API.
