@@ -3,10 +3,7 @@
 A Java-based API test project using the **REST Assured** library.  
 Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
 
-![Java](https://img.shields.io/badge/Java-18-orange?logo=openjdk&logoColor=white)
-![REST Assured](https://img.shields.io/badge/REST_Assured-5.3.0-blue)
-![JUnit](https://img.shields.io/badge/JUnit-4.13.2-green?logo=junit5&logoColor=white)
-![Allure Report](https://img.shields.io/badge/Allure_Report-2.27.0-orange?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMTEzLjkgMzE4LjFsLTM4LjggMjMuNmMtMTMuNCA4LjEtMzAuNS0xLjItMzAuNS0xNi45VjE3OS4yYzAtMTUuNyAxNy4xLTI1IDMwLjUtMTYuOWwzOC44IDIzLjZjMTIuOSA3LjkgMTIuOSAyNi4zIDAgMzQuMnoiLz48L3N2Zz4=&logoColor=white)
+[![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial/)
 
 ---
 
