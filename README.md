@@ -676,17 +676,17 @@ mvn allure:serve                 # open in browser
 The live report is always available at:  
 👉 **https://magdau.github.io/restAssured-tutorial-with-extends/**
 
-### 10. Allure historical trend
+---
 
-**Problem:** Each CI run generated a fresh Allure report without any reference to previous runs. The trend graph in Allure (pass/fail/flaky counts over time) was always empty because the `history/` folder was not preserved between builds.
+### 6. CI runs on feature and fix branches
 
-**Fix:** The workflow now checks out the `gh-pages` branch at the start of each run and copies the `history/` folder from the previous report into `target/allure-results/history/` before generating the new report. Allure reads this folder during report generation and produces a populated trend graph. After publishing, the new `history/` is pushed to `gh-pages` as part of the report, ready for the next run.
+**Problem:** The workflow only triggered on `main`, so tests on `feature/**` and `fix/**` branches were never validated automatically before merge.
 
-The deployment was switched from `actions/upload-pages-artifact` + `actions/deploy-pages` (GitHub Actions source) to `peaceiris/actions-gh-pages` (branch source), which makes the full report — including `history/` — accessible on the `gh-pages` branch between runs.
+**Fix:** Extended the workflow triggers to include `feature/**` and `fix/**` branches. Tests run on all matching branches, but the deploy-to-Pages step is conditionally skipped (`if: github.ref == 'refs/heads/main'`) so only `main` publishes the live report.
 
 ---
 
-### 6. Negative tests (`VideoGameNegativeTests`)
+### 7. Negative tests (`VideoGameNegativeTests`)
 
 **Problem:** All existing tests cover only the happy path — valid IDs, well-formed bodies, expected 200 responses. Error scenarios were untested.
 
@@ -700,7 +700,7 @@ The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily d
 
 ---
 
-### 7. `@Step` annotations for readable Allure reports
+### 8. `@Step` annotations for readable Allure reports
 
 **Problem:** The Allure report showed request/response attachments but no logical breakdown of what each test was doing — all test logic was invisible in the report.
 
@@ -715,7 +715,7 @@ The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily d
 
 ---
 
-### 8. Parameterized tests (`@RunWith(Parameterized.class)`)
+### 9. Parameterized tests (`@RunWith(Parameterized.class)`)
 
 **Problem:** Tests like `getSingleGame` were hardcoded to a single game ID. Testing multiple IDs required duplicating the test method, which is verbose and hard to maintain.
 
@@ -734,8 +734,10 @@ getSingleGame_InvalidId_Returns404[gameId = 99999]
 
 ---
 
-### 6. CI runs on feature and fix branches
+### 10. Allure historical trend
 
-**Problem:** The workflow only triggered on `main`, so tests on `feature/**` and `fix/**` branches were never validated automatically before merge.
+**Problem:** Each CI run generated a fresh Allure report without any reference to previous runs. The trend graph in Allure (pass/fail/flaky counts over time) was always empty because the `history/` folder was not preserved between builds.
 
-**Fix:** Extended the workflow triggers to include `feature/**` and `fix/**` branches. Tests run on all matching branches, but the deploy-to-Pages steps are conditionally skipped (`if: github.ref == 'refs/heads/main'`) so only `main` publishes the live report.
+**Fix:** The workflow now checks out the `gh-pages` branch at the start of each run and copies the `history/` folder from the previous report into `target/allure-results/history/` before generating the new report. Allure reads this folder during report generation and produces a populated trend graph. After publishing, the new `history/` is pushed to `gh-pages` as part of the report, ready for the next run.
+
+The deployment was switched from `actions/upload-pages-artifact` + `actions/deploy-pages` (GitHub Actions source) to `peaceiris/actions-gh-pages` (branch source), which makes the full report — including `history/` — accessible on the `gh-pages` branch between runs.
