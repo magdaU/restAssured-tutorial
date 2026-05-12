@@ -44,10 +44,13 @@ src/
 ├── test/
 │   ├── java/
 │   │   ├── config/
-│   │   │   ├── FootballConfig.java       # Base configuration for Football API
-│   │   │   ├── VideoGameConfig.java      # Base configuration for VideoGame API
-│   │   │   ├── VideoGameEndpoints.java   # VideoGame API endpoint constants
-│   │   │   └── VideoGameTests.java       # VideoGame API tests (CRUD, serialization, schemas)
+│   │   │   ├── FootballConfig.java                    # Base configuration for Football API
+│   │   │   ├── VideoGameConfig.java                   # Base configuration for VideoGame API
+│   │   │   ├── VideoGameEndpoints.java                # VideoGame API endpoint constants
+│   │   │   ├── VideoGameTests.java                    # VideoGame API tests (CRUD, serialization, schemas)
+│   │   │   ├── VideoGameNegativeTests.java            # Negative tests (404, invalid body, null fields)
+│   │   │   ├── VideoGameParameterizedTests.java       # Parameterized tests for valid game IDs 1-5
+│   │   │   └── VideoGameNegativeParameterizedTests.java # Parameterized tests for invalid game IDs
 │   │   ├── objects/
 │   │   │   └── VideoGame.java            # VideoGame POJO model
 │   │   ├── FootbalTests.java             # Football API tests
@@ -57,9 +60,6 @@ src/
 │   └── resources/
 │       ├── VideoGameJsonSchema.json      # JSON Schema for response validation
 │       └── VideoGameXSD.xsd              # XSD Schema for XML response validation
-└── main/
-    └── java/
-        └── resources/                    # (legacy location, not used by Maven)
 ```
 
 ---
@@ -82,20 +82,35 @@ Tested API: **Video Game DB** – a simple, fictional video game database.
 
 ### Tests (`VideoGameTests`)
 
-- `getAllGames` – retrieve all games
+- `getAllGames` – retrieve all games, assert 200
 - `createNewGameByJSON` – create a game via JSON body
 - `createNewGameByXML` – create a game via XML body
 - `updateGame` – update a game (PUT)
 - `deleteGame` – delete a game (DELETE)
-- `getSingleGame` – retrieve a single game by ID
-- `testVideoGameSerializationJSON` – serialize a POJO object to JSON
-- `testVideoGameSerializationXML` – validate XML response against XSD (`VideoGameXSD.xsd`)
-- `testVideoGameSchemaJSON` – validate response against JSON Schema (`VideoGameJsonSchema.json`)
-- `convertJsonToPojo` – deserialize response into a `VideoGame` object
+- `getSingleGame` – retrieve a single game by ID (5)
+- `testVideoGameSerializationJSON` – serialize a POJO to JSON and POST it
+- `testVideoGameSerializationXML` – GET `/videogame/5` as XML and validate against XSD (`VideoGameXSD.xsd`)
+- `testVideoGameSchemaJSON` – GET `/videogame/5` and validate the response against JSON Schema (`VideoGameJsonSchema.json`)
+- `convertJsonToPojo` – GET `/videogame/5`, deserialize JSON response into a `VideoGame` POJO, and log its fields
 - `catureResponseTime` – capture and print response time in milliseconds
 - `assertOnResponseTime` – assert response time is under 1000 ms
 - `getAllGamesVerifyListNotEmpty` – assert the returned game list is not empty
-- `getSingleGameVerifyFields` – assert `id`, `name` and `category` fields on a single game response
+- `getSingleGameVerifyFields` – assert `id`, `name` and `category` fields on GET `/videogame/1`
+
+### Tests (`VideoGameNegativeTests`)
+
+- `getSingleGame_NotFound` – GET non-existent ID (99999) → assert 404
+- `getSingleGame_NegativeId` – GET negative ID (-1) → assert 404
+- `createGame_EmptyBody` – POST empty JSON body `{}` → assert 4xx
+- `createGame_NullFields` – POST POJO with all-null fields → assert 4xx
+
+### Tests (`VideoGameParameterizedTests`)
+
+- `getSingleGame_ReturnsValidFields[gameId = 1..5]` – for each ID in 1-5: assert 200, non-null `name` and `category`, and `id` matches the requested value
+
+### Tests (`VideoGameNegativeParameterizedTests`)
+
+- `getSingleGame_InvalidId_Returns404[gameId = 0/-1/99999/MAX_VALUE]` – for each invalid ID: assert 404
 
 ---
 
@@ -150,24 +165,24 @@ mvn -Dfootball.api.token="your-token" -Dtest=FootbalTests test
 ## 🔍 GPath Tests
 
 ### GpathJSONTest (JSON)
-Advanced querying of JSON responses using **GPath** (Groovy Path) syntax against the VideoGame API:
+Advanced querying of JSON responses using **GPath** (Groovy Path) syntax against the **VideoGame API**:
 
-- `extractMapOfElementsWithFind` – find a game by name using `find { it.name == '...' }`
-- `extractSingleValueWithFind` – find a game by ID using `find { it.id == 1 }`
-- `extractListOfValueWithFindAll` – list games with `reviewScore > 70` using `findAll`
-- `extractSingleValueWithHighestNumber` – game with the highest ID using `max { it.id }`
+- `extractMapOfElementsWithFind` – find a game by name using `find { it.name == 'Resident Evil 4' }`, returns as Map
+- `extractSingleValueWithFind` – find a game by ID using `find { it.id == 1 }.name`
+- `extractListOfValueWithFindAll` – list games with `reviewScore > 70` using `findAll { it.reviewScore > 70 }.name`
+- `extractSingleValueWithHighestNumber` – game name with the highest ID using `max { it.id }.name`
 - `extractMutlipleValuesAndSumThem` – sum of all game IDs using `collect { it.id }.sum()`
 
 ### GpathXMLTests (XML)
-Querying XML responses using **GPath** and **XmlPath** against the VideoGame API.
+Querying XML responses using **GPath** and **XmlPath** against the **VideoGame API**.
 
 > XML response structure: `<List><item category="..."><id/><name/><releaseDate/><reviewScore/><rating/></item></List>`
 
 - `getFirstGameInList` – name of the first game: `List.item[0].name`
-- `getAttribute` – read the `category` attribute: `List.item[0].@category`
+- `getAttribute` – read the `category` XML attribute: `List.item[0].@category`
 - `getListOfXMlNodes` – all game names as a list: `List.item.name`
-- `getListOfXMLNodesByFindAllOnAttribute` – filter games by category: `findAll { it.@category == 'Shooter' }`
-- `getSingleNode` – find a specific game by name: `find { it.name == 'Resident Evil 4' }`
+- `getListOfXMLNodesByFindAllOnAttribute` – filter games by category attribute: `List.item.findAll { it.@category == 'Shooter' }.name`
+- `getSingleNode` – find a specific game by name and assert it equals the expected value: `List.item.find { it.name == 'Resident Evil 4' }.name`
 
 ---
 
@@ -195,10 +210,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 | | |
 |---|---|
 | **Step 1** | Set base URI to `https://videogamedb.uk/api/v2/` |
-| **Step 2** | Send a `GET` request to `/videogame/1` |
+| **Step 2** | Send a `GET` request to `/videogame/5` |
 | **Step 3** | Verify response status code is `200 OK` |
-| **Step 4** | Assert the returned game ID equals `1` |
-| **Expected** | A single video game object is returned with correct ID |
+| **Expected** | A single video game object is returned |
 
 ---
 
@@ -248,9 +262,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 #### `testVideoGameSchemaJSON`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to `/videogame` |
-| **Step 2** | Load `VideoGameJsonSchema.json` from resources |
-| **Step 3** | Validate the full response body against the JSON Schema |
+| **Step 1** | Send a `GET` request to `/videogame/5` |
+| **Step 2** | Load `VideoGameJsonSchema.json` from classpath resources |
+| **Step 3** | Validate the response body against the JSON Schema |
 | **Expected** | Response structure matches the defined schema without validation errors |
 
 ---
@@ -258,8 +272,8 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 #### `testVideoGameSerializationXML`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Load `VideoGameXSD.xsd` from resources |
+| **Step 1** | Send a `GET` request to `/videogame/5` with `Accept: application/xml` |
+| **Step 2** | Load `VideoGameXSD.xsd` from classpath resources |
 | **Step 3** | Validate the XML response against the XSD schema |
 | **Expected** | XML response is valid according to the XSD definition |
 
@@ -268,10 +282,10 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 #### `convertJsonToPojo`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to `/videogame/1` |
+| **Step 1** | Send a `GET` request to `/videogame/5` |
 | **Step 2** | Deserialize the JSON response body into a `VideoGame` POJO |
-| **Step 3** | Assert that the object fields (id, name, category) are not null |
-| **Expected** | JSON successfully maps to a `VideoGame` Java object |
+| **Step 3** | Log all fields of the deserialized object (id, name, category, rating, reviewScore) |
+| **Expected** | JSON successfully maps to a `VideoGame` Java object with all fields populated |
 
 ---
 
@@ -376,29 +390,39 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 #### `extractMapOfElementsWithFind`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 2** | Apply GPath expression: `teams.find { it.name == 'Arsenal FC' }` |
-| **Step 3** | Extract the matching team as a Map |
-| **Expected** | A single team map with Arsenal FC data is returned |
+| **Step 1** | Send a `GET` request to `/videogame` |
+| **Step 2** | Apply GPath expression: `find { it.name == 'Resident Evil 4' }` |
+| **Step 3** | Extract the matching game as a Map and assert it is not null |
+| **Expected** | A single game map for Resident Evil 4 is returned |
+
+---
+
+#### `extractSingleValueWithFind`
+| | |
+|---|---|
+| **Step 1** | Send a `GET` request to `/videogame` |
+| **Step 2** | Apply GPath expression: `find { it.id == 1 }.name` |
+| **Step 3** | Assert the returned game name is not null |
+| **Expected** | The name of the game with ID 1 is returned |
 
 ---
 
 #### `extractListOfValueWithFindAll`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to `/competitions/PL/teams` |
-| **Step 2** | Apply GPath `findAll` to find teams founded after year 1900 |
-| **Step 3** | Extract the list of matching team names |
-| **Expected** | A filtered list of team names satisfying the condition is returned |
+| **Step 1** | Send a `GET` request to `/videogame` |
+| **Step 2** | Apply GPath `findAll { it.reviewScore > 70 }.name` |
+| **Step 3** | Assert the returned list is not empty |
+| **Expected** | A filtered list of game names with reviewScore above 70 is returned |
 
 ---
 
 #### `extractSingleValueWithHighestNumber`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to the video game endpoint |
-| **Step 2** | Apply GPath `max { it.id }` to find the game with the highest ID |
-| **Step 3** | Extract the game name |
+| **Step 1** | Send a `GET` request to `/videogame` |
+| **Step 2** | Apply GPath `max { it.id }.name` to find the game with the highest ID |
+| **Step 3** | Assert the returned name is not null |
 | **Expected** | The name of the game with the maximum ID is returned |
 
 ---
@@ -406,9 +430,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 #### `extractMutlipleValuesAndSumThem`
 | | |
 |---|---|
-| **Step 1** | Send a `GET` request to the video game endpoint |
-| **Step 2** | Apply GPath `collect { it.id }` to extract all IDs |
-| **Step 3** | Call `.sum()` on the collected list |
+| **Step 1** | Send a `GET` request to `/videogame` |
+| **Step 2** | Apply GPath `collect { it.id }.sum()` to sum all game IDs |
+| **Step 3** | Print the result |
 | **Expected** | The total sum of all game IDs is returned as a number |
 
 ---
@@ -422,8 +446,8 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 |---|---|
 | **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
 | **Step 2** | Parse the XML response with `XmlPath` |
-| **Step 3** | Extract `videoGames.videoGame[0].name` |
-| **Expected** | The name of the first game in the XML list is returned |
+| **Step 3** | Extract `List.item[0].name` |
+| **Expected** | The name of the first game in the XML list is returned and is not null |
 
 ---
 
@@ -431,9 +455,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 | | |
 |---|---|
 | **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Parse the XML response |
-| **Step 3** | Extract an attribute value from a specific XML element |
-| **Expected** | The correct XML attribute value is returned |
+| **Step 2** | Parse the XML response with `XmlPath` |
+| **Step 3** | Extract the `category` XML attribute: `List.item[0].@category` |
+| **Expected** | The category attribute of the first game is returned and is not null |
 
 ---
 
@@ -441,9 +465,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 | | |
 |---|---|
 | **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Apply GPath `findAll { it.@category == 'Shooter' }` on the XML response |
-| **Step 3** | Extract the list of matching game nodes |
-| **Expected** | All games belonging to the 'Shooter' category are returned |
+| **Step 2** | Apply GPath `List.item.findAll { it.@category == 'Shooter' }.name` |
+| **Step 3** | Assert the returned list is not empty |
+| **Expected** | All game names belonging to the 'Shooter' category are returned |
 
 ---
 
@@ -451,16 +475,16 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 | | |
 |---|---|
 | **Step 1** | Send a `GET` request to `/videogame` with `Accept: application/xml` |
-| **Step 2** | Apply GPath `find { it.name == 'Resident Evil 4' }` |
-| **Step 3** | Extract the matching XML node |
-| **Expected** | The XML node for 'Resident Evil 4' is returned with all its attributes |
+| **Step 2** | Apply GPath `List.item.find { it.name == 'Resident Evil 4' }.name` |
+| **Step 3** | Assert the returned name equals `"Resident Evil 4"` |
+| **Expected** | The game name 'Resident Evil 4' is found and matches exactly |
 
 ---
 
 ## 🚀 CI/CD & Allure Report on GitHub Pages
 
 Every push to `main` automatically:
-1. Runs `VideoGameTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions
+1. Runs `VideoGameTests`, `VideoGameNegativeTests`, `VideoGameParameterizedTests`, `VideoGameNegativeParameterizedTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions (Football tests excluded — require API token)
 2. Fetches Allure `history/` from the previous deployment (enables trend graphs)
 3. Generates the Allure HTML report with historical trend
 4. Publishes it to **GitHub Pages** via the `gh-pages` branch
@@ -543,7 +567,8 @@ mvn -Dtest=FootbalTests test
 | `FootbalTests` | 12 | ⚠️ Usually pass | HTTP 403 (missing token), HTTP 429 (rate limit), HTTP 500 (server error) |
 | `GpathJSONTest` | 5 | ✅ All pass | None – read-only sandbox API, always available |
 | `GpathXMLTests` | 5 | ✅ All pass | None – read-only sandbox API, always available |
-| **Total** | **49** | | |
+| `MyFirstVideoGame` | 2 | ✅ All pass | None – read-only sandbox API, always available |
+| **Total** | **51** | | |
 
 ---
 

@@ -1,5 +1,8 @@
 import config.VideoGameConfig;
 import config.VideoGameEndpoints;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import io.restassured.path.xml.XmlPath;
 import org.junit.Test;
 
@@ -13,9 +16,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 
 // Actual XML structure: <List><item category="..."><id/><name/><releaseDate/><reviewScore/><rating/></item></List>
+@Feature("Video Game API")
 public class GpathXMLTests extends VideoGameConfig {
 
     @Test
+    @Story("GPath XML")
+    @Description("Extracts the name of the first game in the XML list using List.item[0].name")
     public void getFirstGameInList() {
         String firstName = given()
                 .accept("application/xml")
@@ -30,6 +36,8 @@ public class GpathXMLTests extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath XML")
+    @Description("Reads the category attribute from the first XML item using List.item[0].@category")
     public void getAttribute() {
         XmlPath xmlPath = given()
                 .accept("application/xml")
@@ -44,6 +52,8 @@ public class GpathXMLTests extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath XML")
+    @Description("Extracts all game names as a list using List.item.name")
     public void getListOfXMlNodes() {
         List<String> gameNames = given()
                 .accept("application/xml")
@@ -58,6 +68,8 @@ public class GpathXMLTests extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath XML")
+    @Description("Filters games by category attribute using GPath findAll and returns matching names")
     public void getListOfXMLNodesByFindAllOnAttribute() {
         List<String> shooterGames = given()
                 .accept("application/xml")
@@ -72,6 +84,8 @@ public class GpathXMLTests extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath XML")
+    @Description("Finds a specific game by name using GPath find and asserts the name matches")
     public void getSingleNode() {
         String gameName = given()
                 .accept("application/xml")

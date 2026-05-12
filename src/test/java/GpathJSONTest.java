@@ -1,5 +1,8 @@
 import config.VideoGameConfig;
 import config.VideoGameEndpoints;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import io.restassured.response.Response;
 import org.junit.Test;
 
@@ -12,9 +15,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.empty;
 
+@Feature("Video Game API")
 public class GpathJSONTest extends VideoGameConfig {
 
     @Test
+    @Story("GPath JSON")
+    @Description("Finds a game by name using GPath find expression and returns it as a Map")
     public void extractMapOfElementsWithFind() {
         Response response = given()
                 .when()
@@ -28,6 +34,8 @@ public class GpathJSONTest extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath JSON")
+    @Description("Finds a game by ID using GPath find expression and returns its name")
     public void extractSingleValueWithFind() {
         Response response = given()
                 .when()
@@ -41,6 +49,8 @@ public class GpathJSONTest extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath JSON")
+    @Description("Returns a list of game names where reviewScore > 70 using GPath findAll")
     public void extractListOfValueWithFindAll() {
         Response response = given()
                 .when()
@@ -54,6 +64,8 @@ public class GpathJSONTest extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath JSON")
+    @Description("Returns the name of the game with the highest ID using GPath max expression")
     public void extractSingleValueWithHighestNumber() {
         Response response = given()
                 .when()
@@ -67,6 +79,8 @@ public class GpathJSONTest extends VideoGameConfig {
     }
 
     @Test
+    @Story("GPath JSON")
+    @Description("Sums all game IDs using GPath collect and sum expressions")
     public void extractMutlipleValuesAndSumThem() {
         Response response = given()
                 .when()
