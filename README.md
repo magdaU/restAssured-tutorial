@@ -18,6 +18,10 @@ Originally based on the [Rest Assured Fundamentals](https://www.udemy.com/course
 
 **Live Allure Report:** https://magdau.github.io/restAssured-tutorial-with-extends/
 
+## 📈 Allure Trend
+
+![Allure Trend](docs/allure-trend.png)
+
 ---
 ## 📋 Technology Stack
 
