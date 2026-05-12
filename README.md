@@ -1,7 +1,17 @@
-1# REST Assured Fundamentals
+# REST Assured Fundamentals
 
 A Java-based API test project using the **REST Assured** library.  
-Supporting code for the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
+Originally based on the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy and extended as part of a personal portfolio.
+
+> 📌 **This project goes beyond the original tutorial.** The following improvements have been added independently:
+> - **Allure Reporting** — test results published automatically via GitHub Pages
+> - **GitHub Actions CI** — automated test execution on every push and pull request
+> - **Refactored test structure** — improved assertions, contract tests, data quality checks
+> - **New test classes** — `VideoGameNegativeTests`, `GpathVideoGameTests`, `VideoGameXmlTests`
+> - **Dynamic token handling** — Football API token loaded from environment variable or JVM property
+> - **POJO improvements** — added `toString()`, fixed field consistency
+> - **Maven configuration** — dependency versions extracted to properties, added Surefire plugin
+ssured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy.
 
 [![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial-with-extends/)
 [![CI](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml/badge.svg)](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml)
@@ -683,7 +693,7 @@ The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-p
 
 ---
 
-### 7. Negative tests (`VideoGameNegativeTests`)
+### 6. Negative tests (`VideoGameNegativeTests`)
 
 **Problem:** All existing tests cover only the happy path — valid IDs, well-formed bodies, expected 200 responses. Error scenarios were untested.
 
@@ -697,7 +707,7 @@ The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily d
 
 ---
 
-### 8. `@Step` annotations for readable Allure reports
+### 7. `@Step` annotations for readable Allure reports
 
 **Problem:** The Allure report showed request/response attachments but no logical breakdown of what each test was doing — all test logic was invisible in the report.
 
@@ -712,7 +722,7 @@ The class extends `VideoGameConfig` and uses `@Before`/`@After` to temporarily d
 
 ---
 
-### 9. Parameterized tests (`@RunWith(Parameterized.class)`)
+### 8. Parameterized tests (`@RunWith(Parameterized.class)`)
 
 **Problem:** Tests like `getSingleGame` were hardcoded to a single game ID. Testing multiple IDs required duplicating the test method, which is verbose and hard to maintain.
 
