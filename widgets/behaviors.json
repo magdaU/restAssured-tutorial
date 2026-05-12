@@ -1,1 +1,1 @@
-{"total":13,"items":[{"uid":"39f8c4c1a66c5e502446051e0353d59a","name":"Video Game API","statistic":{"failed":0,"broken":0,"skipped":0,"passed":9,"unknown":0,"total":9}}]}
+{"total":14,"items":[{"uid":"39f8c4c1a66c5e502446051e0353d59a","name":"Video Game API","statistic":{"failed":0,"broken":0,"skipped":0,"passed":9,"unknown":0,"total":9}},{"uid":"23bb2902f1b8ac7fcb5ba9b6ad346e6c","name":"Video Game API - Negative Tests","statistic":{"failed":0,"broken":0,"skipped":0,"passed":2,"unknown":0,"total":2}}]}
