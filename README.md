@@ -16,6 +16,8 @@ Originally based on the [Rest Assured Fundamentals](https://www.udemy.com/course
 [![Allure Report](https://img.shields.io/badge/Allure_Report-view%20results-orange)](https://magdau.github.io/restAssured-tutorial-with-extends/)
 [![CI](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml/badge.svg)](https://github.com/magdaU/restAssured-tutorial-with-extends/actions/workflows/allure-report.yml)
 
+**Live Allure Report:** https://magdau.github.io/restAssured-tutorial-with-extends/
+
 ---
 ## 📋 Technology Stack
 
