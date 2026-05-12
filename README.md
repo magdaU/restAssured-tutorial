@@ -5,7 +5,7 @@ A Java-based API test project using the **REST Assured** library.
 Originally based on the [Rest Assured Fundamentals](https://www.udemy.com/course/rest-assured-fundamentals/?referralCode=2A76479D71A62609414D) course on Udemy and extended as part of a personal portfolio.
 
 > 📌 **This project goes beyond the original tutorial.** The following improvements have been added independently:
-> - **Allure Reporting** — test results published automatically via GitHub Pages
+> - **Allure Reporting** — test results published automatically via GitHub Pages with historical trend
 > - **GitHub Actions CI** — automated test execution on every push and pull request
 > - **Refactored test structure** — improved assertions, contract tests, data quality checks
 > - **New test classes** — `VideoGameNegativeTests`, `GpathVideoGameTests`, `VideoGameXmlTests`
@@ -455,8 +455,9 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 
 Every push to `main` automatically:
 1. Runs `VideoGameTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions
-2. Generates the Allure HTML report
-3. Publishes it to **GitHub Pages**
+2. Fetches Allure `history/` from the previous deployment (enables trend graphs)
+3. Generates the Allure HTML report with historical trend
+4. Publishes it to **GitHub Pages** via the `gh-pages` branch
 
 The **Allure Report** badge at the top of this file links directly to the live report.
 
@@ -466,9 +467,12 @@ Go to **Settings → Pages** in this repository and set:
 
 | Setting | Value |
 |---------|-------|
-| Source  | **GitHub Actions** |
+| Source  | **Deploy from a branch** |
+| Branch  | `gh-pages` / `/ (root)` |
 
-Save — no branch selection needed. The workflow handles deployment automatically on every push.
+Save. The workflow pushes the report to the `gh-pages` branch on every push to `main`.
+
+> **Note:** The first run generates a report without trend data (no history yet). From the second run onwards, each report includes a full trend graph.
 
 ### Re-run manually
 
@@ -614,6 +618,7 @@ mvn -Dtest=FootbalTests test
 | 7 | Negative tests — 404, invalid body, null fields (`VideoGameNegativeTests`) | ✅ Done |
 | 8 | `@Step` annotations in Allure for multi-step tests (`VideoGameTests`) | ✅ Done |
 | 9 | Parameterized tests — valid IDs 1-5 and invalid IDs (`@RunWith(Parameterized.class)`) | ✅ Done |
+| 10 | Allure historical trend — `history/` preserved between CI runs via `gh-pages` branch | ✅ Done |
 
 ---
 
@@ -666,12 +671,18 @@ mvn allure:serve                 # open in browser
 
 **Problem:** The Allure report existed only on the developer's machine and was not accessible to others without running the tests locally.
 
-**Fix:** Added a GitHub Actions workflow (`.github/workflows/allure-report.yml`) that triggers on every push to `main`. It runs all non-Football tests, generates the Allure report, and deploys it to GitHub Pages using the official `actions/deploy-pages` action.
+**Fix:** Added a GitHub Actions workflow (`.github/workflows/allure-report.yml`) that triggers on every push to `main`. It runs all non-Football tests, generates the Allure report, and deploys it to GitHub Pages via the `gh-pages` branch using `peaceiris/actions-gh-pages`.
 
 The live report is always available at:  
 👉 **https://magdau.github.io/restAssured-tutorial-with-extends/**
 
-The workflow uses the modern `actions/upload-pages-artifact` + `actions/deploy-pages` approach (source: **GitHub Actions** in Pages settings), which is more reliable than the legacy branch-based deployment.
+### 10. Allure historical trend
+
+**Problem:** Each CI run generated a fresh Allure report without any reference to previous runs. The trend graph in Allure (pass/fail/flaky counts over time) was always empty because the `history/` folder was not preserved between builds.
+
+**Fix:** The workflow now checks out the `gh-pages` branch at the start of each run and copies the `history/` folder from the previous report into `target/allure-results/history/` before generating the new report. Allure reads this folder during report generation and produces a populated trend graph. After publishing, the new `history/` is pushed to `gh-pages` as part of the report, ready for the next run.
+
+The deployment was switched from `actions/upload-pages-artifact` + `actions/deploy-pages` (GitHub Actions source) to `peaceiris/actions-gh-pages` (branch source), which makes the full report — including `history/` — accessible on the `gh-pages` branch between runs.
 
 ---
 
