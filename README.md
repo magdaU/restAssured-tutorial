@@ -8,7 +8,7 @@ Originally based on the [Rest Assured Fundamentals](https://www.udemy.com/course
 > - **Allure Reporting** — test results published automatically via GitHub Pages with historical trend
 > - **GitHub Actions CI** — automated test execution on every push and pull request
 > - **Refactored test structure** — improved assertions, contract tests, data quality checks
-> - **New test classes** — `VideoGameNegativeTests`, `GpathVideoGameTests`, `VideoGameXmlTests`
+> - **New test classes** — `VideoGameNegativeTests`, `VideoGameParameterizedTests`, `VideoGameNegativeParameterizedTests`
 > - **Dynamic token handling** — Football API token loaded from environment variable or JVM property
 > - **POJO improvements** — added `toString()`, fixed field consistency
 > - **Maven configuration** — dependency versions extracted to properties, added Surefire plugin
@@ -456,7 +456,7 @@ Detailed business-level descriptions of each test with step-by-step scenarios.
 ## 🚀 CI/CD & Allure Report on GitHub Pages
 
 Every push to `main` automatically:
-1. Runs `VideoGameTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions
+1. Runs `VideoGameTests`, `VideoGameNegativeTests`, `VideoGameParameterizedTests`, `VideoGameNegativeParameterizedTests`, `GpathJSONTest`, `GpathXMLTests`, `MyFirstVideoGame` via GitHub Actions
 2. Fetches Allure `history/` from the previous deployment (enables trend graphs)
 3. Generates the Allure HTML report with historical trend
 4. Publishes it to **GitHub Pages** via the `gh-pages` branch
