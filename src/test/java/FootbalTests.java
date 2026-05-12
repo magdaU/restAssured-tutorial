@@ -49,7 +49,7 @@ public class FootbalTests extends FootballConfig {
     public void getDataFounded(){
         given()
                 .when()
-                .get("teams/57")
+                .get("/teams/57")
         .then()
                 .body("founded", equalTo(1886));
     }
@@ -60,7 +60,7 @@ public class FootbalTests extends FootballConfig {
     public void getFirstTeamName(){
         given()
         .when()
-                .get("competitions/2021/teams")
+                .get("/competitions/2021/teams")
         .then()
                 .body("teams.name", hasItem("Arsenal FC"));
     }
@@ -69,7 +69,7 @@ public class FootbalTests extends FootballConfig {
     @Story("Teams")
     @Description("Prints the full JSON response for a team")
     public void getAllTeamData(){
-        String responseBody = get("teams/57").asString();
+        String responseBody = get("/teams/57").asString();
         System.out.println(responseBody);
     }
 
@@ -95,7 +95,7 @@ public class FootbalTests extends FootballConfig {
     @Description("Extracts and prints Content-Type and X-API-Version headers")
     public void extractHeaders(){
         Response response =
-              get("teams/57")
+              get("/teams/57")
                       .then()
                       .extract().response();
         String contentTypeHeader = response.getContentType();
@@ -109,7 +109,7 @@ public class FootbalTests extends FootballConfig {
     @Story("Competitions")
     @Description("Extracts the first team name from the Premier League competition")
     public void extractHeadersTeamName(){
-        String firstTeamName = get("competitions/2021/teams")
+        String firstTeamName = get("/competitions/2021/teams")
                 .jsonPath().getString("teams.name[0]");
         System.out.println(firstTeamName);
     }
@@ -119,7 +119,7 @@ public class FootbalTests extends FootballConfig {
     @Description("Extracts and prints all team names from the Premier League")
     public void extractAllTeams(){
         Response response =
-                get("competitions/2021/teams")
+                get("/competitions/2021/teams")
                         .then()
                         .extract().response();
         List<String> teamNames =

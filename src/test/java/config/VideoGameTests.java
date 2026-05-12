@@ -42,13 +42,6 @@ public class VideoGameTests extends VideoGameConfig {
     @Story("Create game")
     @Description("Creates a new video game using a JSON body")
     public void createNewGameByJSON() {
-        String gameBodyJson = "{\n" +
-                "  \"category\": \"Platform\",\n" +
-                "  \"name\": \"Mario\",\n" +
-                "  \"rating\": \"Mature\",\n" +
-                "  \"releaseDate\": \"2022-05-04\",\n" +
-                "  \"reviewScore\": 89\n" +
-                "}";
         given().header("Content-Type", "application/json")
                 .body(gameBodyJson)
                 .when().post(VideoGameEndpoints.ALL_VIDEO_GAMES).then();
@@ -74,14 +67,14 @@ public class VideoGameTests extends VideoGameConfig {
     @Story("Update game")
     @Description("Updates an existing video game by ID")
     public void updateGame() {
-        given().body(gameBodyJson).when().put("videogame/3").then();
+        given().body(gameBodyJson).when().put("/videogame/3").then();
     }
 
     @Test
     @Story("Delete game")
     @Description("Deletes a video game by ID")
     public void deleteGame() {
-        given().accept("*/*").when().delete("videogame/3").then();
+        given().accept("*/*").when().delete("/videogame/3").then();
     }
 
     @Test
